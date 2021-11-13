@@ -21,6 +21,7 @@
 
 
 將前方POST改為HEAD後送出，就可以看到flag了
+
 ![](https://i.imgur.com/6LT5EqA.png)
 
 ## Cookies
@@ -48,3 +49,43 @@ js檔中提示要如何使網站不要被搜尋到，所以網址列輸入robots
 
 ## dont-use-client-side
 F12看原始碼就可以看到密碼的驗證方法(flag)了
+
+## It is my Birthday
+他需要兩個md5值一樣但內容不一樣的文件
+上網隨便查個碰撞的md5值後寫進檔案丟上網站就好了
+
+```python=
+def main():
+    data1 = "d131dd02c5e6eec4693d9a0698aff95c2fcab58712467eab4004583eb8fb7f8955ad340609f4b30283e488832571415a085125e8f7cdc99fd91dbdf280373c5bd8823e3156348f5bae6dacd436c919c6dd53e2b487da03fd02396306d248cda0e99f33420f577ee8ce54b67080a80d1ec69821bcb6a8839396f9652b6ff72a70"
+    data2 = "d131dd02c5e6eec4693d9a0698aff95c2fcab50712467eab4004583eb8fb7f8955ad340609f4b30283e4888325f1415a085125e8f7cdc99fd91dbd7280373c5bd8823e3156348f5bae6dacd436c919c6dd53e23487da03fd02396306d248cda0e99f33420f577ee8ce54b67080280d1ec69821bcb6a8839396f965ab6ff72a70"
+
+    f1 = open('./asset/data1.pdf', 'wb')
+    hex_data = bytes.fromhex(data1)
+    f1.write(hex_data)
+    f1.close()
+
+    f2 = open('./asset/data2.pdf', 'wb')
+    hex_data = bytes.fromhex(data2)
+    f2.write(hex_data)
+    f2.close()
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
+## Who are you?
+這個網站有關於http request header的介紹，可以從這邊參考每個欄位的意義:https://developer.mozilla.org/zh-TW/docs/Web/HTTP/Headers
+首先他要求要用pico瀏覽器，所以就打開burp suite開始改請求了
+瀏覽器的部分就把User-Agent的值改為PicoBrowser
+接著他說他不信任外來者，所以把Referer改為http://mercury.picoctf.net:38322/
+然後他說這網站只在2018年執行，所以把Date改為2018 例:Wed, 21 Oct 2018 07:28:00 GMT
+接著他又說不信任會被追蹤的人所以把DNT改成1
+接著他要求要從瑞典來的人 需要個瑞典的ip 把X-Forwarded-For改為31.3.152.55
+接著他要我們說瑞典語 把Accept-Language改為sv
+然後就終於結束了 (汗
+
+## picobrowser
+開burp suite改請求
+把User-Agent的值改為picobrowser
