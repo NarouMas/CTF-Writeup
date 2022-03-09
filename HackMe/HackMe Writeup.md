@@ -216,6 +216,84 @@ s155964671a
 ## 30 login as admin 8.1
 請參考此[網站](https://blog.maple3142.net/2020/07/23/hackme-ctf-experience-and-hints/#login-as-admin-8.1)
 
+# Reversing
+## 41 helloworld
+打開程式之後要輸入一串正確的數字，反編譯過後發現程式會將輸入與12B9B0A1進行比較，把他轉為十進位後輸入就可以了。
+
+![](https://i.imgur.com/vHCCIAq.png)
+
+## 42 simple
+這一題可以先注意到有個UIJT.JT.ZPVS.GMBH的字串
+
+![](https://i.imgur.com/36kwK2J.png)
+
+點進去之後題目還很貼心的提示你有沒有聽過凱薩加密
+
+![](https://i.imgur.com/3j7XaQY.png)
+
+拿去解密後也就差不多做完了
+
+不過也是可以認真來看一下反組譯過後的程式碼
+
+![](https://i.imgur.com/rqoSeQy.png)
+
+首先這個區塊將使用者的輸入放入了var_4C的變數，為了後續閱讀方便，我將他重新命名為input
+
+![](https://i.imgur.com/8uFsqUE.png)
+
+接著下面區塊是在比較當前index的輸入是否為'\0'，var_C可視作為for迴圈中的i
+
+![](https://i.imgur.com/T8j7jUt.png)
+
+此部分在比較當前index的輸入是否為換行(對應的ascii碼為0Ah)
+
+![](https://i.imgur.com/ojK4e19.png)
+
+如果比較結果不相等，則將當前index的輸入+1後放入到var_8C變數字串中，後續將此變數命名為decoded_string
+
+![](https://i.imgur.com/n2bpKXs.png)
+
+如果相等(表示為換行)，則將該位置填為'\0'
+
+![](https://i.imgur.com/9WTEVFX.png)
+
+
+將i加1
+
+![](https://i.imgur.com/0oxVnvc.png)
+
+
+將整個輸入字串處理完後會將decoded_string與aUijtJtZpvsGmbh做比較，此處呼叫_strcmp進行比較，比較的回傳值會放置於eax
+
+![](https://i.imgur.com/Bdm3fB9.png)
+
+最後，若兩字串相等便print出flag，否則print出Try hard.
+
+## 43 passthis
+一開始使用ida反編譯時找不到main函式，改使用r2後成功找到main函式位於0x00402760的位置
+
+![](https://i.imgur.com/CVmEzqD.png)
+
+切回到ida並找到對應位置後，前面有一長串沒用的程式碼...，可以直接略過從"Let me check your flag:"的地方開始看
+
+下面的code看過之後發現程式會對下面變數的位置做xor，點進去之後將資料複製做xor，flag就會出現了
+
+![](https://i.imgur.com/n7RjnYl.png)
+
+
+```python=
+data = [0xc1, 0xcb, 0xc6, 0xc0, 0xfc, 0xc9, 0xe8, 0xab, 0xa7, 0xde, 0xe8, 0xf2, 0xa7, 0xf4, 0xef, 0xe8, 0xf2, 0xeb,
+        0xe3, 0xa7, 0xe9, 0xe8, 0xf3, 0xa7, 0xf7, 0xe6, 0xf4, 0xf4, 0xa7, 0xf3, 0xef, 0xe2, 0xa7, 0xe1, 0xeb, 0xe6,
+        0xe0, 0xfa]
+
+for i in range(len(data)):
+    print(chr(data[i] ^ 0x87), end='')
+
+```
+
+
+
+
 
 
 # Pwn
