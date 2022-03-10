@@ -517,3 +517,10 @@ def main():
 ## 82 r u kidding
 [凱薩加密](https://www.dcode.fr/caesar-cipher)
 
+# Forensic
+## 98 easy pdf
+轉為xml格式後ctrl F搜尋就有了
+
+## 99 this is a pen
+轉為doc格式後把第二頁的圖片解群組後，慢慢刪掉其他的圖片後就可以找到了。
+
