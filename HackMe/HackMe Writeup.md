@@ -380,6 +380,23 @@ for i in range(len(data)):
 
 ```
 
+## 44 pyyy
+從題目一開始下載下來的是.pyc檔，先將其反編譯為.py檔
+```
+pip install uncompyle6
+uncompyle6 -o pyyy.py pyyy.pyc
+```
+藉由以上指令可得到.py檔，不過反編譯出來的程式碼是python 2的版本，需要略為修改才能正常執行。
+
+執行程式時會因為遞迴次數過多導致終止，觀察後可以發現元凶在這一個部分
+```python=
+lambda f: lambda x: 1 if x < 2 else f(x - 1) * x % n
+```
+分析此部分後，可以發現其實這就只是一個計算階乘的功用，修改寫法後，再將後面輸入的地方註解掉就可以了
+```python=
+l = (lambda f: (lambda x: x(x))(lambda y: f(lambda *args: y(y)(*args))))(
+        lambda f: lambda x: math.factorial(x) % n)(g % 27777)
+```
 
 
 
