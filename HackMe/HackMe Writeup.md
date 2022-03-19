@@ -398,6 +398,11 @@ l = (lambda f: (lambda x: x(x))(lambda y: f(lambda *args: y(y)(*args))))(
         lambda f: lambda x: math.factorial(x) % n)(g % 27777)
 ```
 
+## 45 accumulator
+程式在比對flag時，會先將一個變數中的值加到比對的文字中，比對完畢後，再將此加總過後的值儲存回該變數中。
+
+因此只需要將儲存的資料值，一一將後面減去前面，得到差值，即可得到flag
+
 
 
 
