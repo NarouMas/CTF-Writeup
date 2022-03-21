@@ -628,6 +628,33 @@ def main():
 ## 82 r u kidding
 [凱薩加密](https://www.dcode.fr/caesar-cipher)
 
+## 83 not hard
+使用python中的base64套件可輕鬆解決。
+
+觀察原始輸入，覺得可能是使用Base85編碼法，解碼後看到文字最後帶有"="符號，嘗試使用base64後得出的結果似乎不正確。
+
+經嘗試後發現應該是要再使用base32解碼，然後flag就出來了。
+```python=
+import base64
+
+data = 'Nm@rmLsBy{Nm5u-K{iZKPgPMzS2I*lPc%_SMOjQ#O;uV{MM*?PPFhk|Hd;hVPFhq{HaAH<'
+data_85 = base64.b85decode(data)
+print(base64.b32decode(data_85))
+```
+
+## 84 classic cipher 1
+可以使用[quipqiup](https://www.quipqiup.com/)這個網站來計算出原本的訊息。
+
+解出來後再去除空格，轉成大寫就可以了。
+
+## 85 classic cipher 2
+這題就是在考Vigenere加密法，這裡就給幾個提示然後就留給大家自己分析了
+
+1. key的長度為51
+2. 解密出來的文章前幾個字為 A CAESAR SALAD IS A SALAD OF ROMAINE
+
+
+
 # Forensic
 ## 98 easy pdf
 轉為xml格式後ctrl F搜尋就有了
