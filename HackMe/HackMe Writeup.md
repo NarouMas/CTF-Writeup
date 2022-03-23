@@ -653,6 +653,40 @@ print(base64.b32decode(data_85))
 1. key的長度為51
 2. 解密出來的文章前幾個字為 A CAESAR SALAD IS A SALAD OF ROMAINE
 
+## 86 easy AES
+題目一開始給了一個py檔，需要安裝pycrypto套件才能正常執行，但不知道是甚麼環境問題，我的電腦無法正常安裝此套件。因此改為安裝"pycryptodome"套件作為替代
+
+接下來，我們需要輸入一個明文，並使用"Hello, World...!"金鑰加密後得到"Good Plain Text!"的結果。
+
+由於AES為對稱式加密，因此先將"Good Plain Text!"以"Hello, World...!"金鑰解密後即可得到對應的明文，這邊需要注意的是此處使用的模式為"ECB"模式
+
+```python=
+c = AES.new(b'Hello, World...!', AES.MODE_ECB)
+plain_text = c.decrypt(b'Good Plain Text!')
+print(plain_text)
+```
+## 87 one time padding
+題目將key為0的可能除去掉了，因此只需要重複蒐集255個加密過後不同的密文，然後找出沒有出現過的那一個，即是flag
+
+然後在蒐集過程中發現，奇數位置的資料是沒有用的資料，因此僅蒐集分析偶數位置的資料
+```python=
+import requests
+
+url = 'https://ctf.hackme.quest/otp/?issue_otp=1'
+
+for i in range(0, 100, 2):
+    table = {}
+    while len(table) != 255:
+        content = requests.get(url)
+        data = content.text.split('\n')
+        for j in range(20):
+            num = data[j][i: i+2]
+            table[int(num, 16)] = 1
+    for j in range(256):
+        if j not in table:
+            print(chr(j), end='')
+            break
+```
 
 
 # Forensic
