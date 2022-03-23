@@ -688,6 +688,11 @@ for i in range(0, 100, 2):
             break
 ```
 
+## 92 xor
+一開始先使用xortool來進行分析得出key為"HACKMEPLS"，從檔案中也可以看到flag的片段，但還不正確。
+
+幾次嘗試過後發現將key轉為小寫就可以了。
+
 
 # Forensic
 ## 98 easy pdf
