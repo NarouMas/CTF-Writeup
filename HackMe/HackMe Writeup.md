@@ -305,6 +305,11 @@ s155964671a
 ## 30 login as admin 8.1
 請參考此[網站](https://blog.maple3142.net/2020/07/23/hackme-ctf-experience-and-hints/#login-as-admin-8.1)
 
+## 31 dafuq-manager 1
+進去之後先以guest/guest登入，接著有個"see-me-if-you-need-tips.txt"的文件告訴我們要創建一個key為help，value為me的cookie。
+
+創建並重新載入後他便問你是否會修改cookie，此時會發現cookie中有一個show hidden的cookie，把value改為yes就可以了。
+
 # Reversing
 ## 41 helloworld
 打開程式之後要輸入一串正確的數字，反編譯過後發現程式會將輸入與12B9B0A1進行比較，把他轉為十進位後輸入就可以了。
