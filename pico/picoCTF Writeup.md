@@ -86,6 +86,23 @@ if __name__ == '__main__':
 接著他要我們說瑞典語 把Accept-Language改為sv
 然後就終於結束了 (汗
 
+## login
+這個網站把驗證程序放在javascript裡，打開讀一下就知道flag了。
+
+## Includes
+打開原始碼後觀察js和css檔裡的flag
+
+## Inspect HTML
+F12 看原始碼 結束。
+
+## Local Authority
+一開始先隨便打個帳號密碼後，會跳轉到一個登入失敗頁面，然後發現他把帳號密碼寫在了javascript裡。
+
+## Search source
+flag藏在了某個css檔裡，慢慢ctrl F就好
+
+
+
 ## picobrowser
 開burp suite改請求
 把User-Agent的值改為picobrowser
