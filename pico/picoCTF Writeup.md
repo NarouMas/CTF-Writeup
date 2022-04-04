@@ -101,6 +101,21 @@ F12 看原始碼 結束。
 ## Search source
 flag藏在了某個css檔裡，慢慢ctrl F就好
 
+## Super Serial
+一開始先查看robots.txt後發現有phps檔案，之後便知道可查看index.phps等檔案來得知原始碼。
+
+然後從authentication.phps中發現read_log()函式中會將檔案給讀取出來，並搭配cookies.phps中的例外顯示該變數，因此可得知要以serialize方法寫入payload到login的cookie中
+
+```php=
+$log = new access_log("../flag");
+echo urlencode(base64_encode(serialize($log)));
+```
+
+## Most Cookies
+這題已flask的session來儲存cookie，而其機制是將cookie進行加密來進行認證，避免被隨意更改。
+
+但原始碼中有寫出可能的key值，一一進行嘗試找到key後，再修改cookie即可
+
 
 
 ## picobrowser
