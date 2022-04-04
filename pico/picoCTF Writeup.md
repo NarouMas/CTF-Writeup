@@ -116,6 +116,8 @@ echo urlencode(base64_encode(serialize($log)));
 
 但原始碼中有寫出可能的key值，一一進行嘗試找到key後，再修改cookie即可
 
+## caas
+可以使用分號來分隔兩個命令
 
 
 ## picobrowser
