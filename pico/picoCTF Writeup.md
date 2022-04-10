@@ -119,7 +119,15 @@ echo urlencode(base64_encode(serialize($log)));
 ## caas
 可以使用分號來分隔兩個命令
 
+## Web Gauntlet 2
+在sql lite中，可以使用||來連接字串所以帳號的部分可以輸入"ad'||'min"來以admin登入
+
+密碼的部分則是可以藉由not的語法來使where部分為true，密碼可為a' is not 'b
+
 
 ## picobrowser
 開burp suite改請求
 把User-Agent的值改為picobrowser
+
+## Client-side-again
+訓練讀噁心程式碼的能力，可以先用pretty js之類的工具整理程式碼
