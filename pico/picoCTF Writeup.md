@@ -131,3 +131,20 @@ echo urlencode(base64_encode(serialize($log)));
 
 ## Client-side-again
 訓練讀噁心程式碼的能力，可以先用pretty js之類的工具整理程式碼
+
+## Web Gauntlet
+要以admin身分登入
+
+
+Round 1 : 不能使用 or， 那就用and吧。 admin' and 1=1 --
+
+Round 2 : 不能使用 or and like = --，帳號依舊輸入admin，密碼的部分則使用not來繞過。 a' is not 'b
+
+Round 3 : 不能使用 or and = like > < --以及空白...，一開始沒注意到試超久...，可以用\/\*\*/的註解方式來替代空白，a'\/\*\*\/is\/\*\*\/not\/\*\*\/'b
+
+Round 4 : 不可以使用admin，可以使用"||"來連接字串，ad'||'min
+
+Round 5 : 可以使用和Round 4 一樣的方式
+
+## Power Cookie
+改cookie，沒甚麼好說的
