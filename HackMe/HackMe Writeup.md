@@ -10,6 +10,37 @@
 ## 3 television
 用strings搜尋就出來了
 
+## 4 meow
+一個正常png檔的結尾應該是[0xae, 0x42, 0x60, 0x82]，但這個圖檔卻不是。再觀察正常檔尾後的二進位碼發現是zip檔的開頭，所以先寫一個程式將其分開。
+```python=
+def main():
+    f = open('./asset/meow.png', 'rb')
+    data = f.read()
+    png_end_data = [0xae, 0x42, 0x60, 0x82]
+    for i in range(len(data)):
+        flag = True
+        for j in range(len(png_end_data)):
+            if data[i + j] != png_end_data[j]:
+                flag = False
+                break
+        if flag:
+            zip_file = open('./asset/meow.zip', 'wb')
+            for j in range(i + 4, len(data)):
+                zip_file.write(data[j].to_bytes(1, byteorder='little'))
+            png_file = open("./asset/pure_meow.png", 'wb')
+            for j in range(i + 4):
+                png_file.write(data[j].to_bytes(1, byteorder='little'))
+
+            return
+```
+
+分割後發現壓縮檔還帶有密碼，觀察壓縮檔內的圖檔CRC檢查碼為CDAD52BD，若將上一步驟分割出的圖檔也壓縮為"plain.zip"，發現其CRC檢查碼也為CDAD52BD。
+
+因此可以使用pkcrack的明文破解方式來進行破解
+```
+./pkcrack -C meow.zip -c "meow/t39.1997-6/p296x100/10173502_279586372215628_1950740854_n.png" -P plain.zip -p pure_meow.png -d result.zip -a
+```
+輸入命令後，即可在result.zip中看到flag
 ## 14 zipfile
 題目給了一個十分難搞的zip檔，可以先用以下的code來做初步的解壓縮
 ```python=
