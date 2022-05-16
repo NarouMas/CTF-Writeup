@@ -25,23 +25,19 @@ def main():
             hashes.append(int(data[j][:-1], 16))
         hashes.append(int(data[3][:-2], 16))
 
-
-    buffer = 'FLAG{CRC32 is fun, but brute force is n'
+    buffer = ''
     a = b = c = 32
-    a = 97
-    b = 97
-    c = 97
-    i = 42
-    j = 13
+    i = 3
+    j = 0
     while i < 0x2b:
         iVar1 = crc32(0, buffer + chr(a) + chr(b) + chr(c), i)
         if iVar1 != hashes[j]:
             c += 1
             if c == 127:
-                c = 97
+                c = 0
                 b += 1
             if b == 127:
-                b = 97
+                b = 0
                 a += 1
             if a == 127:
                 a = 0
@@ -92,21 +88,15 @@ def right_shift_8(a):
 
 
 def crc32(num, buffer, index):
-    #if buffer == 'FLA':
-    #    print('aaaaa')
     global crc32_tab, hashes
     num = '1' * 32
     i = 0
     while index != 0:
-        #if buffer == 'FLA':
-        #    print(hex((xor("{:032b}".format(ord(buffer[i])), num, True))))
         num = xor("{:032b}".format(crc32_tab[xor("{:032b}".format(ord(buffer[i])), num, True)]), (right_shift_8(num)))
         num = "{:032b}".format(num)
 
         index -= 1
         i += 1
-    #if buffer == 'FLA':
-    #    print("return:", int(inverse(num), 2))
     return int(inverse(num), 2)
 
 
