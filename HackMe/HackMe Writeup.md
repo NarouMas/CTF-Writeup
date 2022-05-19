@@ -41,6 +41,18 @@ def main():
 ./pkcrack -C meow.zip -c "meow/t39.1997-6/p296x100/10173502_279586372215628_1950740854_n.png" -P plain.zip -p pure_meow.png -d result.zip -a
 ```
 輸入命令後，即可在result.zip中看到flag
+
+## 5 where is flag
+用正規表達式來找出檔案中的flag
+```python=
+f = open('./asset/flag', 'r')
+data = f.read()
+f.close()
+regex = re.compile('FLAG\{\w+\}')
+match = regex.search(data)
+print(match.group(0))
+```
+
 ## 14 zipfile
 題目給了一個十分難搞的zip檔，可以先用以下的code來做初步的解壓縮
 ```python=
