@@ -1,3 +1,4 @@
-table = [[] for _ in range(5)]
-table[0].append(1)
-print(table)
+import base64
+
+s = "RkxBR3suLi4uLn0="
+print(base64.b64decode(s).decode('utf-8'))
