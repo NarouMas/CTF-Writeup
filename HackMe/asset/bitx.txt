@@ -1,0 +1,43 @@
+.data:0804A040                 db  8Fh
+.data:0804A041                 db 0AAh
+.data:0804A042                 db  85h
+.data:0804A043                 db 0A0h
+.data:0804A044                 db  48h ; H
+.data:0804A045                 db 0ACh
+.data:0804A046                 db  40h ; @
+.data:0804A047                 db  95h
+.data:0804A048                 db 0B6h
+.data:0804A049                 db  16h
+.data:0804A04A                 db 0BEh
+.data:0804A04B                 db  40h ; @
+.data:0804A04C                 db 0B4h
+.data:0804A04D                 db  16h
+.data:0804A04E                 db  97h
+.data:0804A04F                 db 0B1h
+.data:0804A050                 db 0BEh
+.data:0804A051                 db 0BCh
+.data:0804A052                 db  16h
+.data:0804A053                 db 0B1h
+.data:0804A054                 db 0BCh
+.data:0804A055                 db  16h
+.data:0804A056                 db  9Dh
+.data:0804A057                 db  95h
+.data:0804A058                 db 0BCh
+.data:0804A059                 db  41h ; A
+.data:0804A05A                 db  16h
+.data:0804A05B                 db  36h ; 6
+.data:0804A05C                 db  42h ; B
+.data:0804A05D                 db  95h
+.data:0804A05E                 db  95h
+.data:0804A05F                 db  16h
+.data:0804A060                 db  40h ; @
+.data:0804A061                 db 0B1h
+.data:0804A062                 db 0BEh
+.data:0804A063                 db 0B2h
+.data:0804A064                 db  16h
+.data:0804A065                 db  36h ; 6
+.data:0804A066                 db  42h ; B
+.data:0804A067                 db  3Dh ; =
+.data:0804A068                 db  3Dh ; =
+.data:0804A069                 db  49h ; I
+.data:0804A06A                 db  00h
