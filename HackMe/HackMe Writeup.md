@@ -631,6 +631,15 @@ if __name__ == '__main__':
 
 ```
 
+## 48 bitx
+反編譯後在0x804A040的位置找到對應的data後依據程式碼的規則慢慢逆出flag就可以了
+
+## 49 2018-rev
+執行程式後他要求argc要為2018，argv[0][0]與envp[0][0]為1，argc的部分我自己用python產生了2017個額外引數便可解決，argv與envp則可使用c語言中的execve來指定。
+
+![](https://i.imgur.com/18Kxkv6.png)
+
+這一步通過後他又要求要在2018年的1月1日0點整來執行程式，可再藉由settimeofday函式來改變時間後立刻執行程式即可。
 
 
 
@@ -679,6 +688,8 @@ def main():
     r.sendline(b'0')
     r.interactive()
 ```
+
+
 
 ## 59 ROP
 checksec 一下後發現沒有開啟Canary和PIE，程式又有用gets來做讀取
