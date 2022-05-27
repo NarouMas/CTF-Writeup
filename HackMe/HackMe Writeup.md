@@ -931,6 +931,9 @@ for i in range(0, 100, 2):
 
 因此可以比對兩檔案中各個字符的出現次數，若次數相等則代表著他們之間的替換關係，如果有多個可能的替換關係的話，全部顯示出來自己工人智慧一下應該也就能看出flag了。
 
+## 89 login as admin 2
+可以使用[Hash Extender](https://github.com/iagox86/hash_extender)來進行長度擴充攻擊，詳細的原理可以參考這個[網站](https://blog.skullsecurity.org/2012/everything-you-need-to-know-about-hash-length-extension-attacks)。
+
 ## 92 xor
 一開始先使用xortool來進行分析得出key為"HACKMEPLS"，從檔案中也可以看到flag的片段，但還不正確。
 
