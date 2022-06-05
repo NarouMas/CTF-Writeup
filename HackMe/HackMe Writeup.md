@@ -56,6 +56,9 @@ print(match.group(0))
 ## 6 encoder
 可以根據檔案的第一個數字來判斷編碼法是rot13, base64, hex, upsidedown。知道之後就慢慢寫程式反覆進行反編碼後直到開頭不是0,1,2,3就好
 
+## 8 pusheen.txt
+觀察之後會發現裡面就只有兩種貓重複出現，然後一個當0一個當1，binary再解碼成ascii就可以了
+
 ## 14 zipfile
 題目給了一個十分難搞的zip檔，可以先用以下的code來做初步的解壓縮
 ```python=
