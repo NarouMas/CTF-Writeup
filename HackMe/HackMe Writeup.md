@@ -59,6 +59,21 @@ print(match.group(0))
 ## 8 pusheen.txt
 觀察之後會發現裡面就只有兩種貓重複出現，然後一個當0一個當1，binary再解碼成ascii就可以了
 
+## 9 big
+檔案下載解壓縮兩次之後會是一個16GB的檔案...
+
+接著就也沒甚麼技巧，慢慢讀就好了
+```python=
+f = open("./asset/big~", 'r')
+while True:
+    content = f.read(16)
+    if content != 'THISisNOTFLAG{}\n':
+        print(content)
+        content = f.read(1000)
+        print(content)
+        input()
+```
+
 ## 14 zipfile
 題目給了一個十分難搞的zip檔，可以先用以下的code來做初步的解壓縮
 ```python=
@@ -644,7 +659,58 @@ if __name__ == '__main__':
 
 這一步通過後他又要求要在2018年的1月1日0點整來執行程式，可再藉由settimeofday函式來改變時間後立刻執行程式即可。
 
+## 50 what-the-hell
+程式一開始需要輸入兩個特定的變數，這些檢查條件可以透過使用z3來解決
+```python=
+a = BitVec('a', 32)
+b = BitVec('b', 32)
+s = Solver()
+s.add(a * b == 0xddc34132)
+s.add((a ^ 0x7e) * (b + 0x10) == 0x732092be)
+s.add((a - b) & 0xfff == 0xcdf)
+s.add()
+check = s.check()
+print(check)
+print(s.model())
+```
 
+接著程式會用遞迴的方式算費式數列，接著算出key來，需要改寫一下這邊來自己計算出key(或是你可以等到天荒地老)
+```c=
+#include<stdio.h>
+unsigned long fib[0x98967e];
+
+unsigned int cal_key(unsigned int a, unsigned int b)
+{
+	unsigned int key, var_c = 1;
+	
+	while(var_c <= 0x98967e)
+	{
+		if(var_c > 1)
+			fib[var_c] = (fib[var_c - 1] + fib[var_c - 2]) % (1 << 31);	
+		else
+			fib[var_c] = var_c;
+		
+		if(fib[var_c] == a)
+			return var_c * b + 1;
+		else
+			var_c += 1;
+	
+	}
+	return 0;
+} 
+
+int main()
+{
+	unsigned int a, b, key;
+	a = 2136772529;
+	b = 1234567890;
+	key = cal_key(a, b);
+	printf("a:%u b:%u key:%u\n", a, b, key);
+}
+
+```
+
+算出key後，再使用gdb執行程式，在0x804882b修改值來跳過檢查條件，再於後面將eax修改為key便可以得出flag了
 
 # Pwn
 ## 57 catflag
