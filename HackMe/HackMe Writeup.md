@@ -1,3 +1,8 @@
+---
+title: HackMe Writeup
+
+---
+
 # HackMe Writeup
 此WriteUp的完整程式碼於此[GitHub](https://github.com/NarouMas/CTF-Writeup)中
 # Misc
@@ -55,6 +60,33 @@ print(match.group(0))
 
 ## 6 encoder
 可以根據檔案的第一個數字來判斷編碼法是rot13, base64, hex, upsidedown。知道之後就慢慢寫程式反覆進行反編碼後直到開頭不是0,1,2,3就好
+
+## 7 slow
+每多猜對一個字，print 出 Bye 所需的時間就會多加一秒，知道這個規則後就可以寫 script 慢慢去爆破了
+```python=
+flag = "FLAG{"
+char_set = "0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ}"
+for _ in range(60):
+    for c in char_set:
+        start_time = time.time()
+        r = remote("ctf.hackme.quest", 7708)
+        r.recvuntil(b'What is your flag? ')
+        r.sendline((flag + c).encode('ascii'))
+        r.recvuntil(b'Bye')
+        r.close()
+
+        end_time = time.time()
+        connection_time = end_time - start_time
+        print(f"Connection time: {connection_time} seconds, target time: {len(flag) + 2}, try: {c}, current flag: {flag}")
+
+        if connection_time >= len(flag) + 2:
+            flag += c
+            print("char find, current flag:", flag)
+            if c == '}':
+                print("The whole flag is found:", flag)
+                return
+            break
+```
 
 ## 8 pusheen.txt
 觀察之後會發現裡面就只有兩種貓重複出現，然後一個當0一個當1，binary再解碼成ascii就可以了
