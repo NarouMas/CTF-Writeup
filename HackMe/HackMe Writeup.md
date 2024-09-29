@@ -814,6 +814,30 @@ int main()
 
 找到程式並解析後發現他是對輸入做 md5 雜湊後與記憶體中的值做比較，該指定的值為 34AF0D074B17F44D1BB939765B02776F，對其做 md5 解碼後輸入就可以得出 flag 了
 
+## 52 mov
+整個程式幾乎都是透過 mov 來做執行的，不過一開始有調用兩次 sigaction 來讓程式出現 SIGILL 或 SIGSEGV 的時候跳轉的指定位址，不過再意外的嘗試下發現只要輸入的 flag 前面的字是對的話程式就會 print 出 Good flag，所以可以一個一個字慢慢嘗試就好
+```python=
+flag = "FLAG{"
+char_set = "0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{}"
+for _ in range(60):
+    for c in char_set:
+        r = process("./asset/mov")
+        r.recvuntil(b'Input flag: ')
+        r.send((flag + c).encode('ascii'))
+        res = r.recvline().decode('ascii')
+        r.close()
+
+        if 'Good flag' in res:
+            find = True
+            flag += c
+            print("char find, current flag:", flag)
+            if c == '}':
+                print("The whole flag is found:", flag)
+                return
+            break
+```
+
+
 # Pwn
 ## 57 catflag
 就直接連上去就好了
