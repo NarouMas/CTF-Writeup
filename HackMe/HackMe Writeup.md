@@ -5,6 +5,9 @@ title: HackMe Writeup
 
 # HackMe Writeup
 此WriteUp的完整程式碼於此[GitHub](https://github.com/NarouMas/CTF-Writeup)中
+
+如果你是從 github 看到這篇 md 的人，可以從[這裡](https://hackmd.io/@NarouMas/Sk6ghF18K)，連到 hackmd 頁面
+
 # Misc
 ## 1 flag
 摁... flag就已經在那邊了
@@ -837,6 +840,33 @@ for _ in range(60):
             break
 ```
 
+## 53 sha256sum
+總之先丟 ida，發現被加殼，從 Segment 名稱看到 .enigma2 ，可以得知說應該是用了 Enigma Protector，但也沒甚麼幫助就是了，接著嘗試用動態解的方法
+
+![image](https://hackmd.io/_uploads/rkLRdXckgl.png)
+
+用 x64dbg 先 F9 跳到 EntryPoint 再開始慢慢分析，啟動的時候記得設定好 Command Line
+
+![image](https://hackmd.io/_uploads/SJMeqXqyxg.png)
+```
+"D:\download\sha256sum.exe" sha256sum.exe flag.txt
+```
+
+Trace 到後面發現他應該是將真正的 code 先 pack 到不知道甚麼地方，然後後面用 Virtual Protect 修改記憶體權限，接著再把 code 給寫進去，接著再 jump 過去
+
+![image](https://hackmd.io/_uploads/HyE69m5ygx.png)
+
+Trace 到下面圖片的地方附近，可以注意到 flag.txt 被作為引數在 CreateFileW function 中被呼叫了，接著再追進 sha256sum.14000122C 看看
+
+![image](https://hackmd.io/_uploads/SJzPiXqyxe.png)
+
+然後可以發現說， flag.txt 的 handle 被作為 argument ，被 ReadFile function 呼叫，所以就在資料視窗中跟隨 outputbuffer 的地址就可以看到 flag.txt 的內容了
+
+![image](https://hackmd.io/_uploads/ByqBTXcJgx.png)
+
+![image](https://hackmd.io/_uploads/HkVNpm5kgx.png)
+
+然而，flag.txt 的內容看得不是很懂，看前面幾個字以為是摩斯密碼，但後面又有出現除了長、短、分隔符外的字，再觀察後發現是 ASCII Art，再整理一下， print 出來就可以看到 flag 了
 
 # Pwn
 ## 57 catflag
