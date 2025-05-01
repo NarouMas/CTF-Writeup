@@ -868,6 +868,39 @@ Trace 到下面圖片的地方附近，可以注意到 flag.txt 被作為引數�
 
 然而，flag.txt 的內容看得不是很懂，看前面幾個字以為是摩斯密碼，但後面又有出現除了長、短、分隔符外的字，再觀察後發現是 ASCII Art，再整理一下， print 出來就可以看到 flag 了
 
+
+## 54 a-maze
+總之先執行，顯示以下訊息
+```
+Usage: ./maze input-map hidden-message
+```
+
+開 ida 分析，main function 先檢查 argument 數目，再把 map 讀進來，然後跳到 sub_400890，sub_400890 就會開始將輸入做運算，然後與 map 中的資料做比較
+
+![image](https://hackmd.io/_uploads/SkW8l5gxel.png)
+
+運算的方法是將 v2 向左位移 9 位後，再將一個字元 ascii 值乘 4 後相加，再去 map 對應的位置取值，將取到的值作為下一輪的 v2 繼續運算，直到字串遍歷完畢後或從 map 取得的值為 -1。
+
+觀察 map 當中的值可以發現說當中的值還蠻稀疏的，大多都是 0，所以就寫個 queue，將從 map 中取到的值不是 0 的記下，進行搜尋，就可以找出 flag 了。
+
+```python=
+f = open("./asset/map", 'rb')
+data = f.read()
+f.close()
+qu = queue.Queue()
+qu.put(('', 0))
+while not qu.empty():
+    flag, n = qu.get()
+    for c in range(32, 128):
+        v = (data[(n << 9) + (4 * c)]) + (data[(n << 9) + (4 * c) + 1] << 8)
+        if v != 0:
+            if v == 0xffff:
+                print("Find flag:", flag + chr(c))
+                exit(0)
+            qu.put((flag + chr(c), v))
+            print(f"cur:{flag + chr(c)}, data:{v}")
+```
+
 # Pwn
 ## 57 catflag
 就直接連上去就好了
