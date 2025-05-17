@@ -901,6 +901,39 @@ while not qu.empty():
             print(f"cur:{flag + chr(c)}, data:{v}")
 ```
 
+## 55 esrever-mv
+發現說可以一個字一個字試，但應該不是正統解法，不知道為甚麼我寫的 script 會不穩定，一次可能會試出多個候補，所以需要手動判斷一下。
+```python=
+charset = [chr(c) for c in range(32, 128)]
+flag = ''
+while True:
+    can = ""
+    for c in charset:
+        r = process("./asset/esrever-mv")
+        data = (flag + c).encode('utf-8')
+        r.send(data)
+        print("data:", data)
+        message = r.recv()
+        r.close()
+        print("message:", message)
+        if message.decode() == 'Input flag: ':
+            can += c
+            #print("flag:", flag)
+    print("flag:", flag)
+    print("can:", can)  
+    flag += input('intput:')
+```
+
+下面是一些不重要的分析心得
+
+VM 在逆向工程裡面，是把原本的 instruction 進行包裝，變成該 VM 特製化的 instruction，在 sub_400FA0 中，是這題 VM 的核心。
+
+VM 便會根據圖中的 switch 去執行 opcode 對應的動作
+
+![image](https://hackmd.io/_uploads/rk5H-THWgl.png)
+
+因此這題的正統解法應該是要去分析每一個 opcode 裡面是做了甚麼事情，再寫程式自動化的去模擬這件事情，但在做這件事之前，因為我找到偷吃步的方法所以就沒有然後了。
+
 # Pwn
 ## 57 catflag
 就直接連上去就好了
